@@ -95,10 +95,13 @@ object Async {
     */
   def futurize(callbackBasedApi: CallbackBasedApi): FutureBasedApi = {
     val p = Promise[Int]
-    callbackBasedApi.computeIntAsync(x => {val _ = x match {
-      case Success(i) =>  p.trySuccess(i)
-      case Failure(e) =>  p.tryFailure(e)
-    }})
+    callbackBasedApi.computeIntAsync({ attempt =>
+      attempt match {
+        case Success(i) =>  p.trySuccess(i)
+        case Failure(e) =>  p.tryFailure(e)
+      }
+      ()
+    })
     () => p.future
   }
 }
