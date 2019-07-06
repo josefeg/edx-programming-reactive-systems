@@ -69,7 +69,6 @@ class BinaryTreeSet extends Actor {
   val normal: Receive = {
     case o: Operation => root ! o
     case GC => {
-
       val newRoot = createRoot
       root ! CopyTo(newRoot)
       context.become(garbageCollecting(newRoot))
@@ -236,6 +235,7 @@ class BinaryTreeNode(val elem: Int, initiallyRemoved: Boolean) extends Actor {
   def onCopy(node: ActorRef): Unit = {
     if (removed && subtrees.isEmpty) {
       // nothing to do here
+      context.parent ! CopyFinished
       context.stop(self)
       return
     }
